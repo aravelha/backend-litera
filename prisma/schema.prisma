@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  username  String
+  email     String    @unique
+  password  String
+  createdAt DateTime
+  updatedAt DateTime  @updatedAt
+  reviews   Review[]  @relation("userHasReviews")
+}
+
+model Book {
+  id          String    @id // ID dari Google Books API
+  title       String
+  genre       String[]
+  authors     String?
+  thumbnail   String?
+  description String?
+  createdAt   DateTime
+  updatedAt   DateTime  @updatedAt
+  reviews     Review[]  @relation("bookHasReviews")
+}
+
+model Review {
+  id        String    @id @default(uuid())
+  userId    String
+  bookId    String
+  comment   String?
+  createdAt DateTime
+  updatedAt DateTime  @updatedAt
+
+  user      User      @relation("userHasReviews", fields: [userId], references: [id])
+  book      Book      @relation("bookHasReviews", fields: [bookId], references: [id])
+}
