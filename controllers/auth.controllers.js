@@ -17,6 +17,9 @@ async function registerUser(req, res) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Log hashed password untuk memastikan proses hashing berjalan baik
+    console.log('Hashed Password:', hashedPassword);
+
     const data = await prisma.user.create({
       data: {
         username,
@@ -42,6 +45,60 @@ async function registerUser(req, res) {
   }
 }
 
+async function login(req, res) {
+  try {
+    const { email, password } = req.body;
+
+    let data = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        password: true,
+      },
+    });
+
+    if (!data) {
+      throw new Error('User tidak ditemukan');
+    }
+
+    console.log('Password input:', password);
+    console.log('Password in DB:', data.password);
+
+    const match = await bcrypt.compare(password, data.password);
+    if (!match) {
+      throw new Error('Password tidak valid');
+    }
+
+    const id = data.id;
+
+    const token = jwt.sign({ id }, process.env.JWT_SECRET, {
+      expiresIn: '60s',
+    });
+
+    data = {
+      ...data,
+    };
+
+    res.status(200).json({
+      success: true,
+      message: 'Berhasil login',
+      data: data,
+      token,
+    });
+  } catch (error) {
+    console.log('Login Error:', error.message);
+    res.status(400).json({
+      success: false,
+      message: 'Gagal login.',
+    });
+  }
+}
+
 module.exports = {
   registerUser,
+  login,
 };

@@ -7,6 +7,7 @@ const {
 
 const {
   registerUser,
+  login,
 } = require('./auth.controllers');
 
 module.exports = {
@@ -15,4 +16,5 @@ module.exports = {
   deleteUserById,
   updateUserById,
   registerUser,
+  login,
 };
