@@ -1,15 +1,18 @@
 const {
-  addNewUser,
   getAllUser,
   getUserById,
   deleteUserById,
   updateUserById,
 } = require('./user.controllers');
 
+const {
+  registerUser,
+} = require('./auth.controllers');
+
 module.exports = {
-  addNewUser,
   getAllUser,
   getUserById,
   deleteUserById,
   updateUserById,
+  registerUser,
 };

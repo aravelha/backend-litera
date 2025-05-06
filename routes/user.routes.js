@@ -5,9 +5,7 @@ const { uploadSingleImage } = require('../middlewares/imageUpload');
 const router = express.Router();
 
 router.get('/users/all', getAllUser);
-router.post('/user/new', uploadSingleImage('image'), validateUser, addNewUser); //add image here
 router.get('/user/:id', getUserById);
-router.post('/user/new', uploadSingleImage('image'), validateUser, addNewUser);
 router.delete('/user/:id', deleteUserById);
 router.put('/user/:id', uploadSingleImage('image'), updateUserById);
 
