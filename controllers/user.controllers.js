@@ -28,7 +28,7 @@ async function getUserById(req, res) {
     }
 
     if (user.image) {
-      user.image = `http://localhost:3000/${user.image}`;
+      user.image = `http://localhost:3000/${user.image}`; //turn image routes into url
     }
 
     res.status(200).json({ success: true, data: user });
@@ -60,7 +60,6 @@ async function updateUserById(req, res) {
     const { id } = req.params;
     const { username, email, password } = req.body;
 
-    // Optional: handle file upload
     const updatedData = {
       username,
       email,
