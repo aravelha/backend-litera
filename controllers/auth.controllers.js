@@ -16,8 +16,6 @@ async function registerUser(req, res) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Log hashed password untuk memastikan proses hashing berjalan baik
     console.log('Hashed Password:', hashedPassword);
 
     const data = await prisma.user.create({
@@ -76,7 +74,7 @@ async function login(req, res) {
     const id = data.id;
 
     const token = jwt.sign({ id }, process.env.JWT_SECRET, {
-      expiresIn: '60s',
+      expiresIn: '1h',
     });
 
     data = {
