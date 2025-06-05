@@ -6,15 +6,7 @@ const path = require('path');
 
 const app = express();
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS || "http://litera-wine.vercel.app"
-
-app.use(cors({
-  origin: allowedOrigins,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-})
-);
+app.use(cors());
 
 app.use(express.json());
 
