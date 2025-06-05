@@ -12,10 +12,16 @@ async function createReview(req, res) {
     let book = await prisma.book.findUnique({ where: { id: bookId } });
 
     if (!book) {
-      const response = await axios.get(
-        `https://www.googleapis.com/books/v1/volumes/${bookId}`
-      );
-      const volumeInfo = response.data.volumeInfo;
+      const response = await axios.get(`https://www.googleapis.com/books/v1/volumes/${bookId}`);
+      
+      if (!response.data || !response.data.volumeInfo || !response.data.volumeInfo.title) {
+        return res.status(404).json({
+          success: false,
+          message: 'Buku tidak ditemukan di Google Books API',
+  }   );
+}
+
+    const volumeInfo = response.data.volumeInfo;
 
       book = await prisma.book.create({
         data: {

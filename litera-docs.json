@@ -1,0 +1,265 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Litera API",
+    "description": "Dokumentasi API untuk Litera, aplikasi mirip Goodreads yang memungkinkan user mencari buku dan menulis review.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local server"
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Register user",
+        "description": "Mendaftarkan user baru dengan gambar profil.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" },
+                  "image": { "type": "string", "format": "binary" }
+                },
+                "required": ["username", "email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User berhasil dibuat" },
+          "400": { "description": "Validasi gagal / Email sudah digunakan" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login user",
+        "description": "Login dan mendapatkan token JWT.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login sukses" },
+          "400": { "description": "Login gagal" }
+        }
+      }
+    },
+    "/books/search": {
+      "get": {
+        "summary": "Cari buku",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": { "type": "string" },
+            "required": true,
+            "description": "Keyword pencarian buku"
+          }
+        ],
+        "responses": {
+          "200": { "description": "List buku ditemukan" },
+          "500": { "description": "Error mengambil buku" }
+        }
+      }
+    },
+    "/books/{bookId}": {
+      "get": {
+        "summary": "Detail buku + review",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "schema": { "type": "string" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "description": "Buku dan review ditemukan" },
+          "500": { "description": "Gagal mengambil detail" }
+        }
+      }
+    },
+    "/reviews": {
+      "post": {
+        "summary": "Buat review",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "bookId": { "type": "string" },
+                  "comment": { "type": "string" }
+                },
+                "required": ["bookId", "comment"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Review berhasil ditambahkan" },
+          "400": { "description": "Gagal menambahkan review" }
+        }
+      }
+    },
+    "/reviews/{bookId}": {
+      "get": {
+        "summary": "Ambil semua review dari buku",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bookId",
+            "schema": { "type": "string" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "description": "List review ditemukan" },
+          "500": { "description": "Gagal mengambil review" }
+        }
+      }
+    },
+    "/reviews/{reviewId}": {
+      "put": {
+        "summary": "Update review",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "reviewId",
+            "schema": { "type": "string" },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "comment": { "type": "string" }
+                },
+                "required": ["comment"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Review updated" },
+          "400": { "description": "Gagal update review" }
+        }
+      },
+      "delete": {
+        "summary": "Hapus review",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "reviewId",
+            "schema": { "type": "string" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "description": "Review dihapus" },
+          "400": { "description": "Gagal hapus review" }
+        }
+      }
+    },
+    "/users/all": {
+      "get": {
+        "summary": "Ambil semua user",
+        "responses": {
+          "200": { "description": "List user ditemukan" }
+        }
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "summary": "Ambil user berdasarkan ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "string" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "description": "User ditemukan" },
+          "404": { "description": "User tidak ditemukan" }
+        }
+      },
+      "put": {
+        "summary": "Update user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string" },
+                  "email": { "type": "string" },
+                  "password": { "type": "string" },
+                  "image": { "type": "string", "format": "binary" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "User diupdate" },
+          "400": { "description": "Gagal update user" }
+        }
+      },
+      "delete": {
+        "summary": "Hapus user",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "string" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "description": "User dihapus" },
+          "400": { "description": "Gagal hapus user" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
