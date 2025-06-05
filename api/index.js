@@ -1,12 +1,15 @@
 const express = require('express');
 const cors = require('cors');
-const Router = require('./routes');
+const Router = require('../routes');
 require('dotenv').config();
 const path = require('path');
 
 const app = express();
+
+const allowedOrigins = process.env.ALLOWED_ORIGINS || "http://litera-wine.vercel.app"
+
 app.use(cors({
-  origin: '*',
+  origin: allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
