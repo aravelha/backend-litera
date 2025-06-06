@@ -4,7 +4,7 @@ const { searchBooks, getBookDetailWithReviews, getPopularBooks } = require('../c
 
 
 router.get('/books/search', searchBooks); // cari buku
-router.get('/books/popular', getPopularBooks); //buku populer buat di landing page
+router.get('/popular', getPopularBooks); //buku populer buat di landing page
 router.get('/books/:bookId', getBookDetailWithReviews); //detail buku + review
 
 module.exports = router;
