@@ -64,15 +64,28 @@ async function getReviewsByBook(req, res) {
 
     const reviews = await prisma.review.findMany({
       where: { bookId },
-      include: { user: true },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            image: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
 
     res.status(200).json({
       success: true,
       data: reviews.map((r) => ({
+        id: r.id,
+        userId: r.userId,
         user: r.user.username,
         comment: r.comment,
-        createdAt: r.createdAt,
+        createdAt: r.createdAt
       })),
     });
   } catch (error) {
