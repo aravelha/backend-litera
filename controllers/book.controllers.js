@@ -70,10 +70,10 @@ async function getBookDetailWithReviews(req, res) {
 async function getPopularBooks(req, res) {
   try {
     const response = await axios.get(
-      'https://www.googleapis.com/books/v1/volumes?q=bestseller&maxResults=10'
+      'https://www.googleapis.com/books/v1/volumes?q=subject:fiction&orderBy=relevance&maxResults=10'
     );
 
-    const books = response.data.items.map((item) => ({
+    const books = (response.data.items || []).map((item) => ({
       id: item.id,
       title: item.volumeInfo.title,
       authors: item.volumeInfo.authors || [],
