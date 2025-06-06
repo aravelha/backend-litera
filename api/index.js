@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
     <p>Try running: <code>https://backend-litera.vercel.app/books/search?q=(judul+judul)</code></p>
     <h3>Example:</h3>
     <p><a href="https://backend-litera.vercel.app/books/search?q=the+stranger" target="_blank">https://backend-litera.vercel.app/books/search?q=the+stranger</a></p>
-    <p><a href="https://backend-litera.vercel.app/books/search?q=laut+bercerita" target="_blank">https://backend-litera.vercel.app/books/search?q=laut+bercerita</a></p>
+    <p><a href="https://backend-litera.vercel.app/books/search?q=on+earth+we're+briefly+gorgeous" target="_blank">https://backend-litera.vercel.app/books/search?q=on+earth+we're+briefly+gorgeous</a></p>
   `);
 });
 
