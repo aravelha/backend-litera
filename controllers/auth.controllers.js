@@ -96,7 +96,17 @@ async function login(req, res) {
   }
 }
 
+async function logout(req, res) {
+  // For JWT, logout is handled on the client by removing the token.
+  // This endpoint just informs the client to do so.
+  res.status(200).json({
+    success: true,
+    message: 'Berhasil logout. Silakan hapus token di client.',
+  });
+}
+
 module.exports = {
   registerUser,
   login,
+  logout,
 };
