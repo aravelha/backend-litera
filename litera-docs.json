@@ -2,20 +2,38 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Litera API",
-    "description": "Dokumentasi API untuk Litera, aplikasi mirip Goodreads yang memungkinkan user mencari buku dan menulis review.",
+    "description": "Dokumentasi API untuk Litera - Platform review buku berbasis Google Books API",
     "version": "1.0.0"
   },
   "servers": [
     {
       "url": "http://localhost:3000",
-      "description": "Local server"
+      "description": "Local development server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "auth",
+      "description": "Endpoint autentikasi pengguna"
+    },
+    {
+      "name": "books",
+      "description": "Endpoint pencarian dan detail buku"
+    },
+    {
+      "name": "reviews",
+      "description": "Endpoint ulasan buku"
+    },
+    {
+      "name": "users",
+      "description": "Endpoint data pengguna"
     }
   ],
   "paths": {
     "/auth/register": {
       "post": {
-        "summary": "Register user",
-        "description": "Mendaftarkan user baru dengan gambar profil.",
+        "tags": ["auth"],
+        "summary": "Register user baru",
         "requestBody": {
           "required": true,
           "content": {
@@ -34,15 +52,15 @@
           }
         },
         "responses": {
-          "201": { "description": "User berhasil dibuat" },
-          "400": { "description": "Validasi gagal / Email sudah digunakan" }
+          "201": { "description": "User berhasil didaftarkan" },
+          "400": { "description": "Validasi gagal atau email sudah digunakan" }
         }
       }
     },
     "/auth/login": {
       "post": {
+        "tags": ["auth"],
         "summary": "Login user",
-        "description": "Login dan mendapatkan token JWT.",
         "requestBody": {
           "required": true,
           "content": {
@@ -59,49 +77,51 @@
           }
         },
         "responses": {
-          "200": { "description": "Login sukses" },
+          "200": { "description": "Login berhasil, token diberikan" },
           "400": { "description": "Login gagal" }
         }
       }
     },
     "/books/search": {
       "get": {
-        "summary": "Cari buku",
+        "tags": ["books"],
+        "summary": "Cari buku berdasarkan keyword",
         "parameters": [
           {
-            "in": "query",
             "name": "q",
-            "schema": { "type": "string" },
+            "in": "query",
             "required": true,
-            "description": "Keyword pencarian buku"
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
-          "200": { "description": "List buku ditemukan" },
-          "500": { "description": "Error mengambil buku" }
+          "200": { "description": "Daftar buku dari Google Books API" },
+          "500": { "description": "Gagal mengambil data buku" }
         }
       }
     },
     "/books/{bookId}": {
       "get": {
-        "summary": "Detail buku + review",
+        "tags": ["books"],
+        "summary": "Ambil detail buku + review",
         "parameters": [
           {
-            "in": "path",
             "name": "bookId",
-            "schema": { "type": "string" },
-            "required": true
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
-          "200": { "description": "Buku dan review ditemukan" },
-          "500": { "description": "Gagal mengambil detail" }
+          "200": { "description": "Detail buku dan review" },
+          "500": { "description": "Gagal mengambil detail buku" }
         }
       }
     },
     "/reviews": {
       "post": {
-        "summary": "Buat review",
+        "tags": ["reviews"],
+        "summary": "Tambah review untuk buku (auth required)",
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -120,37 +140,38 @@
         },
         "responses": {
           "201": { "description": "Review berhasil ditambahkan" },
-          "400": { "description": "Gagal menambahkan review" }
+          "400": { "description": "Gagal validasi atau gagal membuat review" }
         }
       }
     },
     "/reviews/{bookId}": {
       "get": {
-        "summary": "Ambil semua review dari buku",
+        "tags": ["reviews"],
+        "summary": "Ambil semua review untuk buku",
         "parameters": [
           {
-            "in": "path",
             "name": "bookId",
-            "schema": { "type": "string" },
-            "required": true
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
-          "200": { "description": "List review ditemukan" },
-          "500": { "description": "Gagal mengambil review" }
+          "200": { "description": "Daftar review buku" }
         }
       }
     },
     "/reviews/{reviewId}": {
       "put": {
-        "summary": "Update review",
+        "tags": ["reviews"],
+        "summary": "Update review (auth required)",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
-            "in": "path",
             "name": "reviewId",
-            "schema": { "type": "string" },
-            "required": true
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
           }
         ],
         "requestBody": {
@@ -168,44 +189,50 @@
           }
         },
         "responses": {
-          "200": { "description": "Review updated" },
-          "400": { "description": "Gagal update review" }
+          "200": { "description": "Review berhasil diupdate" },
+          "403": { "description": "Unauthorized - bukan pemilik review" },
+          "400": { "description": "Update gagal" }
         }
       },
       "delete": {
-        "summary": "Hapus review",
+        "tags": ["reviews"],
+        "summary": "Hapus review (auth required)",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
-            "in": "path",
             "name": "reviewId",
-            "schema": { "type": "string" },
-            "required": true
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
-          "200": { "description": "Review dihapus" },
-          "400": { "description": "Gagal hapus review" }
+          "200": { "description": "Review berhasil dihapus" },
+          "403": { "description": "Unauthorized - bukan pemilik review" },
+          "400": { "description": "Gagal menghapus review" }
         }
       }
     },
     "/users/all": {
       "get": {
+        "tags": ["users"],
         "summary": "Ambil semua user",
         "responses": {
-          "200": { "description": "List user ditemukan" }
+          "200": { "description": "Daftar user" },
+          "400": { "description": "Gagal mengambil data user" }
         }
       }
     },
     "/user/{id}": {
       "get": {
+        "tags": ["users"],
         "summary": "Ambil user berdasarkan ID",
         "parameters": [
           {
-            "in": "path",
             "name": "id",
-            "schema": { "type": "string" },
-            "required": true
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
@@ -214,6 +241,7 @@
         }
       },
       "put": {
+        "tags": ["users"],
         "summary": "Update user",
         "requestBody": {
           "required": true,
@@ -232,23 +260,16 @@
           }
         },
         "responses": {
-          "200": { "description": "User diupdate" },
-          "400": { "description": "Gagal update user" }
+          "200": { "description": "User berhasil diupdate" },
+          "400": { "description": "Update gagal" }
         }
       },
       "delete": {
+        "tags": ["users"],
         "summary": "Hapus user",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "schema": { "type": "string" },
-            "required": true
-          }
-        ],
         "responses": {
-          "200": { "description": "User dihapus" },
-          "400": { "description": "Gagal hapus user" }
+          "200": { "description": "User berhasil dihapus" },
+          "400": { "description": "Gagal menghapus user" }
         }
       }
     }
