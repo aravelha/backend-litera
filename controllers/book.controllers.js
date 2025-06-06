@@ -20,13 +20,11 @@ async function searchBooks(req, res) {
 
     res.status(200).json({ success: true, books });
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: 'Gagal mengambil data buku',
-        error: err.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: 'Gagal mengambil data buku',
+      error: err.message,
+    });
   }
 }
 
@@ -61,14 +59,42 @@ async function getBookDetailWithReviews(req, res) {
       })),
     });
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: 'Gagal mengambil detail buku',
-        error: err.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: 'Gagal mengambil detail buku',
+      error: err.message,
+    });
   }
 }
 
-module.exports = { searchBooks, getBookDetailWithReviews };
+async function getPopularBooks(req, res) {
+  try {
+    const response = await axios.get(
+      'https://www.googleapis.com/books/v1/volumes?q=bestseller&maxResults=10'
+    );
+
+    const books = response.data.items.map((item) => ({
+      id: item.id,
+      title: item.volumeInfo.title,
+      authors: item.volumeInfo.authors || [],
+      thumbnail: item.volumeInfo.imageLinks?.thumbnail || null,
+      description: item.volumeInfo.description || null,
+      genre: item.volumeInfo.categories || [],
+      rating: item.volumeInfo.averageRating || 0,
+    }));
+
+    res.status(200).json({ success: true, books });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'Gagal mengambil buku populer',
+      error: err.message,
+    });
+  }
+}
+
+module.exports = {
+  searchBooks,
+  getBookDetailWithReviews,
+  getPopularBooks,
+};
