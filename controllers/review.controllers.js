@@ -78,15 +78,19 @@ async function getReviewsByBook(req, res) {
       }
     });
 
+    // Map reviews with complete user data
+    const mappedReviews = reviews.map((review) => ({
+      id: review.id,
+      userId: review.userId,
+      username: review.user.username, // Get username from user relationship
+      userImage: review.user.image,
+      comment: review.comment,
+      createdAt: review.createdAt
+    }));
+
     res.status(200).json({
       success: true,
-      data: reviews.map((r) => ({
-        id: r.id,
-        userId: r.userId,
-        user: r.user.username,
-        comment: r.comment,
-        createdAt: r.createdAt
-      })),
+      data: mappedReviews
     });
   } catch (error) {
     res.status(500).json({
@@ -96,7 +100,6 @@ async function getReviewsByBook(req, res) {
     });
   }
 }
-
 async function updateReview(req, res) {
   try {
     const { reviewId } = req.params;
