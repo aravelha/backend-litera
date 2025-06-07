@@ -164,6 +164,7 @@ async function getAllReviews(req, res) {
         user: r.user.username,
         bookTitle: r.book.title,
         comment: r.comment,
+        bookThumbnail: r.book?.thumbnail || '',
         createdAt: r.createdAt,
       })),
     });
