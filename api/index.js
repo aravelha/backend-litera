@@ -27,9 +27,8 @@ app.use(Router);
 app.get('/', (req, res) => {
   res.send(`
     <h1>📚 Litera API is running!</h1>
-    <br>
     <p>Welcome to Litera's backend!</p>
-    <p>📄 Here is the full API documentation: <a href="/api-docs" target="_blank">/api-docs</a></p>
+
     <br>
     <p>Try running: <code>https://backend-litera.vercel.app/books/search?q=(judul+judul)</code></p>
     <h3>Example:</h3>
