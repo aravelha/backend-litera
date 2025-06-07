@@ -182,16 +182,26 @@ async function getMyReviews(req, res) {
 
     const reviews = await prisma.review.findMany({
       where: { userId },
-      include: { book: true },
+      include: {
+        book: true,
+        user: true,
+      },
     });
 
     res.status(200).json({
       success: true,
       data: reviews.map((r) => ({
-        bookTitle: r.book.title,
-        bookThumbnail: r.book.thumbnail,
+        id: r.id,
         comment: r.comment,
         createdAt: r.createdAt,
+        userId: r.userId,
+        username: r.user?.username || '', // pastikan ada username
+        bookId: r.bookId,
+        bookTitle: r.book?.title || '',
+        bookAuthors: r.book?.authors || '',
+        bookThumbnail: r.book?.thumbnail || '',
+        bookDescription: r.book?.description || '',
+        // tambahkan field lain jika perlu
       })),
     });
   } catch (error) {
