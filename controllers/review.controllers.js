@@ -149,9 +149,65 @@ async function deleteReview(req, res) {
   }
 }
 
+async function getAllReviews(req, res) {
+  try {
+    const reviews = await prisma.review.findMany({
+      include: {
+        user: true,
+        book: true,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: reviews.map((r) => ({
+        user: r.user.username,
+        bookTitle: r.book.title,
+        comment: r.comment,
+        createdAt: r.createdAt,
+      })),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Gagal mengambil semua review',
+      error: error.message,
+    });
+  }
+}
+
+async function getMyReviews(req, res) {
+  try {
+    const userId = req.user.id;
+
+    const reviews = await prisma.review.findMany({
+      where: { userId },
+      include: { book: true },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: reviews.map((r) => ({
+        bookTitle: r.book.title,
+        comment: r.comment,
+        createdAt: r.createdAt,
+      })),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Gagal mengambil review milik user ini',
+      error: error.message,
+    });
+  }
+}
+
+
 module.exports = {
   createReview,
   getReviewsByBook,
   updateReview,
   deleteReview,
+  getAllReviews,
+  getMyReviews,
 };
