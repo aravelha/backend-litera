@@ -4,11 +4,17 @@ const prisma = new PrismaClient();
 
 async function getAllUser(req, res) {
   try {
-    const allUserData = await prisma.user.findMany();
+    const allUserData = await prisma.user.findMany({
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        image: true,
+        createdAt: true,
+        // password: false, // hide
+      },
+    });
 
-    if (!allUserData) {
-      throw new Error('Data user tidak ditemukan');
-    }
     res.status(200).json({ success: true, data: allUserData });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -21,6 +27,14 @@ async function getUserById(req, res) {
 
     const user = await prisma.user.findUnique({
       where: { id },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        image: true,
+        createdAt: true,
+        // password: false, // hide
+      },
     });
 
     if (!user) {
@@ -28,7 +42,7 @@ async function getUserById(req, res) {
     }
 
     if (user.image) {
-      user.image = `http://localhost:3000/${user.image}`; //turn image routes into url
+      user.image = `http://localhost:3000/${user.image}`;
     }
 
     res.status(200).json({ success: true, data: user });
