@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Litera API",
-    "description": "Dokumentasi API untuk Litera - Platform review buku berbasis Google Books API",
+    "description": "Dokumentasi API Litera, Final Project Kelompok 4 Capstone",
     "version": "1.0.0"
   },
   "servers": [
@@ -12,28 +12,17 @@
     }
   ],
   "tags": [
-    {
-      "name": "auth",
-      "description": "Endpoint autentikasi pengguna"
-    },
-    {
-      "name": "books",
-      "description": "Endpoint pencarian dan detail buku"
-    },
-    {
-      "name": "reviews",
-      "description": "Endpoint ulasan buku"
-    },
-    {
-      "name": "users",
-      "description": "Endpoint data pengguna"
-    }
+    { "name": "auth", "description": "Endpoint autentikasi pengguna" },
+    { "name": "users", "description": "Endpoint data pengguna" },
+    { "name": "books", "description": "Endpoint pencarian dan detail buku" },
+    { "name": "reviews", "description": "Endpoint ulasan buku" }
   ],
   "paths": {
     "/auth/register": {
       "post": {
         "tags": ["auth"],
         "summary": "Register user baru",
+        "description": "Mendaftarkan user baru ke platform.",
         "requestBody": {
           "required": true,
           "content": {
@@ -61,6 +50,7 @@
       "post": {
         "tags": ["auth"],
         "summary": "Login user",
+        "description": "Login user dan mendapatkan JWT token.",
         "requestBody": {
           "required": true,
           "content": {
@@ -82,10 +72,101 @@
         }
       }
     },
+    "/auth/logout": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Logout user",
+        "description": "Logout user (hapus token di client).",
+        "responses": {
+          "200": { "description": "Logout berhasil" }
+        }
+      }
+    },
+    "/users/all": {
+      "get": {
+        "tags": ["users"],
+        "summary": "Ambil semua user",
+        "description": "Mengambil daftar seluruh user.",
+        "responses": {
+          "200": { "description": "Daftar user" },
+          "400": { "description": "Gagal mengambil data user" }
+        }
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "tags": ["users"],
+        "summary": "Ambil user berdasarkan ID",
+        "description": "Mengambil data user berdasarkan ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "User ditemukan" },
+          "404": { "description": "User tidak ditemukan" }
+        }
+      },
+      "put": {
+        "tags": ["users"],
+        "summary": "Update user",
+        "description": "Update data user berdasarkan ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string" },
+                  "email": { "type": "string" },
+                  "password": { "type": "string" },
+                  "image": { "type": "string", "format": "binary" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "User berhasil diupdate" },
+          "400": { "description": "Update gagal" }
+        }
+      },
+      "delete": {
+        "tags": ["users"],
+        "summary": "Hapus user",
+        "description": "Menghapus user berdasarkan ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "User berhasil dihapus" },
+          "400": { "description": "Gagal menghapus user" }
+        }
+      }
+    },
     "/books/search": {
       "get": {
         "tags": ["books"],
         "summary": "Cari buku berdasarkan keyword",
+        "description": "Mencari buku dari Google Books API berdasarkan keyword.",
         "parameters": [
           {
             "name": "q",
@@ -104,6 +185,7 @@
       "get": {
         "tags": ["books"],
         "summary": "Ambil detail buku + review",
+        "description": "Mengambil detail buku dari Google Books API beserta review dari database.",
         "parameters": [
           {
             "name": "bookId",
@@ -118,10 +200,22 @@
         }
       }
     },
+    "/popular": {
+      "get": {
+        "tags": ["books"],
+        "summary": "Ambil buku populer",
+        "description": "Mengambil daftar buku populer dari Google Books API.",
+        "responses": {
+          "200": { "description": "Daftar buku populer" },
+          "500": { "description": "Gagal mengambil buku populer" }
+        }
+      }
+    },
     "/reviews": {
       "post": {
         "tags": ["reviews"],
         "summary": "Tambah review untuk buku (auth required)",
+        "description": "Menambahkan review untuk buku tertentu. Hanya untuk user yang sudah login.",
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -142,12 +236,22 @@
           "201": { "description": "Review berhasil ditambahkan" },
           "400": { "description": "Gagal validasi atau gagal membuat review" }
         }
+      },
+      "get": {
+        "tags": ["reviews"],
+        "summary": "Ambil semua review",
+        "description": "Mengambil semua review dari database.",
+        "responses": {
+          "200": { "description": "Daftar review" },
+          "500": { "description": "Gagal mengambil review" }
+        }
       }
     },
     "/reviews/{bookId}": {
       "get": {
         "tags": ["reviews"],
         "summary": "Ambil semua review untuk buku",
+        "description": "Mengambil semua review untuk buku tertentu berdasarkan bookId.",
         "parameters": [
           {
             "name": "bookId",
@@ -165,6 +269,7 @@
       "put": {
         "tags": ["reviews"],
         "summary": "Update review (auth required)",
+        "description": "Update review milik user yang sedang login.",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
@@ -197,6 +302,7 @@
       "delete": {
         "tags": ["reviews"],
         "summary": "Hapus review (auth required)",
+        "description": "Menghapus review milik user yang sedang login.",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
@@ -213,63 +319,15 @@
         }
       }
     },
-    "/users/all": {
+    "/my-reviews": {
       "get": {
-        "tags": ["users"],
-        "summary": "Ambil semua user",
+        "tags": ["reviews"],
+        "summary": "Ambil review milik user yang sedang login",
+        "description": "Mengambil semua review yang dibuat oleh user yang sedang login.",
+        "security": [{ "bearerAuth": [] }],
         "responses": {
-          "200": { "description": "Daftar user" },
-          "400": { "description": "Gagal mengambil data user" }
-        }
-      }
-    },
-    "/user/{id}": {
-      "get": {
-        "tags": ["users"],
-        "summary": "Ambil user berdasarkan ID",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": { "description": "User ditemukan" },
-          "404": { "description": "User tidak ditemukan" }
-        }
-      },
-      "put": {
-        "tags": ["users"],
-        "summary": "Update user",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "username": { "type": "string" },
-                  "email": { "type": "string" },
-                  "password": { "type": "string" },
-                  "image": { "type": "string", "format": "binary" }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "User berhasil diupdate" },
-          "400": { "description": "Update gagal" }
-        }
-      },
-      "delete": {
-        "tags": ["users"],
-        "summary": "Hapus user",
-        "responses": {
-          "200": { "description": "User berhasil dihapus" },
-          "400": { "description": "Gagal menghapus user" }
+          "200": { "description": "Daftar review user" },
+          "500": { "description": "Gagal mengambil review user" }
         }
       }
     }
@@ -280,6 +338,42 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "username": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "image": { "type": "string", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Book": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "genre": { "type": "array", "items": { "type": "string" } },
+          "authors": { "type": "string", "nullable": true },
+          "thumbnail": { "type": "string", "nullable": true },
+          "description": { "type": "string", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Review": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "userId": { "type": "string" },
+          "bookId": { "type": "string" },
+          "comment": { "type": "string", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "user": { "$ref": "#/components/schemas/User" },
+          "book": { "$ref": "#/components/schemas/Book" }
+        }
       }
     }
   }
