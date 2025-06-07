@@ -189,6 +189,7 @@ async function getMyReviews(req, res) {
       success: true,
       data: reviews.map((r) => ({
         bookTitle: r.book.title,
+        bookThumbnail: r.book.thumbnail,
         comment: r.comment,
         createdAt: r.createdAt,
       })),
